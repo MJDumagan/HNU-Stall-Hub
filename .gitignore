@@ -1,14 +1,19 @@
+
 # Dependencies
 node_modules/
 
 # Next.js generated files
 .next/
 out/
+frontend/.next/
+frontend/out/
 
 # Environment variables and secrets
 .env
 .env.*
 !.env.example
+backend/.env
+frontend/.env
 
 # Build files
 build/
@@ -18,3 +23,7 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
