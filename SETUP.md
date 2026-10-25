@@ -18,13 +18,14 @@ The browser does not connect directly to Supabase and does not contain database 
 
 - Login checks the stored password hash and selected role, then sets a signed, HTTP-only cookie. Customer and seller registration are database-backed; seller accounts are created with their own stall in one transaction.
 - Customer pages show active stalls and products queried from PostgreSQL. Checkout accepts only product IDs and quantities; it derives customer identity, stall, prices, and totals from the authenticated account/database.
-- Checkout locks product and inventory rows in one transaction, checks stock, saves the order and item snapshots, and decrements stock atomically. A stale/insufficient cart is rejected instead of overselling.
+- Checkout locks product and inventory rows in one transaction, checks stock, saves the order and item snapshots, and decrements stock atomically. A stale/insufficient cart is rejected i qnstead of overselling.
 - Seller dashboard queries only the stall assigned to the authenticated seller. Product edits, inventory changes, and order status transitions check ownership on the backend. Customer history is filtered by the authenticated customer.
 - Status transitions are `Pending → Confirmed → Preparing → Ready for Pickup → Completed`. Product removal is a soft removal so completed order details remain available.
 
 ## Before deployment
 
 - The repository includes [`render.yaml`](./render.yaml) for deploying the Next.js frontend and Express API as separate Render web services. In Render, create a Blueprint from the GitHub repository and select the `master` branch (or whichever branch contains this file).
+- Both services are configured with Render's `free` plan. Free web services sleep after 15 minutes without traffic and can take about a minute to wake up; they are best for demos and testing, not production. Render's free instance hours are shared across services in the workspace, so monitor usage in the Render dashboard.
 - Enter `DATABASE_URL` and `SESSION_SECRET` as private environment values for the `hnu-stallhub-api` service. Do not put database credentials or session secrets in GitHub or frontend environment variables.
 - The frontend uses a same-origin `/api` path. Next.js proxies those requests to the backend using `BACKEND_URL`, and Render wires that variable to the API service. This keeps the browser session cookie same-site while the backend remains a separate service; the backend CORS setting is not needed for this proxy path.
 - Locally, `BACKEND_URL` defaults to `http://localhost:5000`; run the backend and frontend in separate terminals. Local database access still needs `DATABASE_URL` and `SESSION_SECRET` in `backend/.env`.
