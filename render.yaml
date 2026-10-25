@@ -1,4 +1,4 @@
-services:
+ services:
   - type: web
     name: hnu-stallhub-api
     runtime: node
@@ -27,7 +27,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: BACKEND_URL
-        fromService:
-          type: web
-          name: hnu-stallhub-api
-          property: host
+        value: https://hnu-stallhub-api.onrender.com
