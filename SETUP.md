@@ -24,7 +24,9 @@ The browser does not connect directly to Supabase and does not contain database 
 
 ## Before deployment
 
-- Configure `DATABASE_URL`, `SESSION_SECRET`, `FRONTEND_ORIGIN`, and the frontend API URL in the deployment platform's secret/environment settings.
-- Serve the frontend and API over HTTPS in production. Use a trusted Supabase connection string and do not expose it in frontend variables.
-- This application uses direct PostgreSQL connections from the trusted API; do not put the database service-role/password key in the frontend. Configure Supabase network access/pooling appropriately for the API host.
+- The repository includes [`render.yaml`](./render.yaml) for deploying the Next.js frontend and Express API as separate Render web services. In Render, create a Blueprint from the GitHub repository and select the `master` branch (or whichever branch contains this file).
+- Enter `DATABASE_URL` and `SESSION_SECRET` as private environment values for the `hnu-stallhub-api` service. Do not put database credentials or session secrets in GitHub or frontend environment variables.
+- The frontend uses a same-origin `/api` path. Next.js proxies those requests to the backend using `BACKEND_URL`, and Render wires that variable to the API service. This keeps the browser session cookie same-site while the backend remains a separate service; the backend CORS setting is not needed for this proxy path.
+- Locally, `BACKEND_URL` defaults to `http://localhost:5000`; run the backend and frontend in separate terminals. Local database access still needs `DATABASE_URL` and `SESSION_SECRET` in `backend/.env`.
+- Use the Supabase PostgreSQL connection URI (Session Pooler if required by your network) for the API service. The database connection is used by the backend only.
 - Existing tables and data cannot be verified from this workspace because no database schema export or usable database credentials were provided.

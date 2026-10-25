@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: hnu-stallhub-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+
+  - type: web
+    name: hnu-stallhub-web
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: hnu-stallhub-api
+          property: host

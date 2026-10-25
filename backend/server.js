@@ -3,9 +3,14 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+const frontendOrigins = (process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => {
+    const value = origin.trim();
+    return new URL(value.includes('://') ? value : `https://${value}`).origin;
+  });
 
-app.use(cors({ origin: frontendOrigin, credentials: true }));
+app.use(cors({ origin: frontendOrigins, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use((req, res, next) => {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) req.body = {};
