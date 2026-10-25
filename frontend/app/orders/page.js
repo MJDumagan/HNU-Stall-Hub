@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import LoadingScreen from '../components/loading-screen';
 import { apiRequest } from '../../lib/api';
 import { useRequireRole } from '../../lib/use-require-role';
 
@@ -21,10 +23,10 @@ export default function CustomerOrdersPage() {
     return () => { active = false; window.clearInterval(timer); };
   }, [ready]);
 
-  if (!ready) return <main className="site-shell"><p className="message">Loading...</p></main>;
+  if (!ready) return <LoadingScreen title="Your orders are on the way" message="Checking your order history..." />;
   return (
     <main className="site-shell">
-      <header className="navbar"><Link href="/" className="brand"><span className="brand-icon">S</span>Stall<span>Hub</span></Link><nav className="nav-links"><Link href="/">Browse stalls</Link><Link href="/orders">My Orders</Link></nav></header>
+      <header className="navbar"><Link href="/" className="brand"><Image className="brand-logo" src="/hnu-logo.png" alt="Holy Name University crest" width={34} height={40} />Stall<span>Hub</span></Link><nav className="nav-links"><Link href="/">Browse stalls</Link><Link href="/orders">My Orders</Link></nav></header>
       <section className="orders-page">
         <p className="eyebrow">CUSTOMER ACCOUNT</p><h1>My orders</h1><p className="section-description">Track active orders and revisit your order history.</p>
         {error && <div className="error-message" role="alert">{error}</div>}

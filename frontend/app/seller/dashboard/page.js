@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import LoadingScreen from '../../components/loading-screen';
 import { apiRequest, logout } from '../../../lib/api';
 import { useRequireRole } from '../../../lib/use-require-role';
 
@@ -106,12 +108,15 @@ export default function SellerDashboardPage() {
     }
   }
 
-  if (!ready) return <main className="site-shell"><p className="message">Loading seller account...</p></main>;
+  if (!ready) return <LoadingScreen title="Welcome back" message="Securing your seller dashboard..." />;
 
   return (
     <main className="site-shell">
       <header className="navbar">
-        <Link href="/seller/dashboard" className="brand"><span className="brand-icon">S</span>Stall<span>Hub</span></Link>
+        <Link href="/seller/dashboard" className="brand">
+          <Image className="brand-logo" src="/hnu-logo.png" alt="Holy Name University crest" width={34} height={40} />
+          Stall<span>Hub</span>
+        </Link>
         <nav className="nav-links"><a href="#menu">My menu</a><a href="#orders">Orders</a></nav>
         <div className="account-actions"><span className="account-name">{user?.full_name}</span><button className="outline-button" onClick={handleLogout}>Log out</button></div>
       </header>
@@ -119,7 +124,7 @@ export default function SellerDashboardPage() {
       <section className="seller-page">
         {error && <div className="error-message" role="alert">{error}</div>}
         {notice && <div className="success-message" role="status">{notice}</div>}
-        {!dashboard ? <p className="message">Loading your stall...</p> : <>
+        {!dashboard ? <LoadingScreen title="Preparing your stall" message="Loading your menu and latest orders..." /> : <>
           <div className="seller-welcome">
             <div><p className="eyebrow">SELLER DASHBOARD</p><h1>{dashboard.stall.store_name}</h1><p>{dashboard.stall.store_location || 'Holy Name University'}{dashboard.stall.description ? ` · ${dashboard.stall.description}` : ''}</p></div>
             <div className="seller-summary"><span>{dashboard.products.filter((product) => product.is_available).length} active menu items</span><span>{dashboard.orders.filter((order) => order.order_status !== 'Completed').length} open orders</span></div>

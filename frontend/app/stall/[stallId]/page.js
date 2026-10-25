@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import LoadingScreen from '../../components/loading-screen';
 import { apiRequest } from '../../../lib/api';
 import { useRequireRole } from '../../../lib/use-require-role';
 
@@ -54,7 +55,7 @@ export default function StallMenuPage() {
     }
   }
 
-  if (!ready) return <main className="site-shell"><p className="message">Loading...</p></main>;
+  if (!ready) return <LoadingScreen title="Opening the stall" message="Getting the latest menu ready..." />;
 
   return (
     <main className="site-shell">

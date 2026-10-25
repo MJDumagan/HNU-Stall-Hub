@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import LoadingScreen from './components/loading-screen';
 import { apiRequest, logout } from '../lib/api';
 import { useRequireRole } from '../lib/use-require-role';
 
@@ -29,7 +30,7 @@ export default function Home() {
     }
   }
 
-  if (!ready) return <main className="site-shell"><p className="message">Loading your account...</p></main>;
+  if (!ready) return <LoadingScreen title="Welcome to StallHub" message="Preparing your campus food hub..." />;
 
   return (
     <main className="site-shell">
