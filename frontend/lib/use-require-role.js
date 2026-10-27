@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiRequest } from './api';
+import { apiRequest, isSessionSignedOut, logout, markSessionSignedOut } from './api';
 
 export function useRequireRole(role) {
   const router = useRouter();
@@ -12,25 +12,65 @@ export function useRequireRole(role) {
 
   useEffect(() => {
     let active = true;
-    apiRequest('/auth/me')
-      .then(({ data }) => {
-        if (!active) return;
+    let requestId = 0;
+
+    async function checkSession(reset = false) {
+      const currentRequestId = ++requestId;
+      if (reset) {
+        setReady(false);
+        setUser(null);
+      }
+      if (isSessionSignedOut()) {
+        router.replace('/login');
+        return;
+      }
+      try {
+        const { data } = await apiRequest('/auth/me');
+        if (!active || currentRequestId !== requestId) return;
+        if (isSessionSignedOut()) {
+          router.replace('/login');
+          return;
+        }
         if (data.user.role !== role) {
-          router.replace(data.user.role === 'seller' ? '/seller/dashboard' : '/');
+          const destinations = {
+            admin: '/admin/dashboard',
+            seller: '/seller/dashboard',
+            customer: '/',
+          };
+          router.replace(destinations[data.user.role] || '/login');
           return;
         }
         setUser(data.user);
         setReady(true);
-      })
-      .catch(() => {
-        if (!active) return;
+      } catch {
+        if (!active || currentRequestId !== requestId) return;
         router.replace('/login');
-      })
-      .finally(() => {
-        if (active) setError('');
-      });
+      } finally {
+        if (active && currentRequestId === requestId) setError('');
+      }
+    }
+
+    function handlePopState() {
+      if (window.location.pathname === '/login') {
+        markSessionSignedOut();
+        requestId += 1;
+        logout().catch((logoutError) => setError(logoutError.message));
+        return;
+      }
+      checkSession(true);
+    }
+
+    function handlePageShow(event) {
+      if (event.persisted) checkSession(true);
+    }
+
+    checkSession();
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('pageshow', handlePageShow);
     return () => {
       active = false;
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('pageshow', handlePageShow);
     };
   }, [role, router]);
 

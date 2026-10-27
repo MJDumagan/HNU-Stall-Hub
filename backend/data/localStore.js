@@ -18,7 +18,7 @@ function listActiveProducts() {
     .sort((a, b) => b.product_id - a.product_id);
 }
 
-function addProduct({ product_name, price, sku }) {
+function addProduct({ product_name, price }) {
   const store = readStore();
   const product = {
     product_id: store.nextId++,
@@ -26,7 +26,6 @@ function addProduct({ product_name, price, sku }) {
     category_id: 1,
     product_name,
     price: Number(price),
-    sku,
     is_active: true,
     category_name: 'Marketplace item',
   };

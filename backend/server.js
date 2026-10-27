@@ -11,7 +11,7 @@ const frontendOrigins = (process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
   });
 
 app.use(cors({ origin: frontendOrigins, credentials: true }));
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '14mb' }));
 app.use((req, res, next) => {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) req.body = {};
   next();
@@ -21,6 +21,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/stalls', require('./routes/stalls'));
 app.use('/api/customer', require('./routes/customer'));
 app.use('/api/vendor', require('./routes/vendor'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/products', require('./routes/products'));
 
 app.get('/', (req, res) => {
@@ -55,7 +56,28 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`API server running at http://localhost:${PORT}`);
-  console.log(`Check API and database status at http://localhost:${PORT}/api/health`);
-});
+
+async function startServer() {
+  try {
+    const result = await require('./config/db').query(
+      `SELECT role.rolsuper,
+              pg_has_role(current_user, 'stallhub_app', 'member') AS has_application_role
+       FROM pg_roles AS role
+       WHERE role.rolname = current_user`
+    );
+    if (!result.rowCount || result.rows[0].rolsuper || !result.rows[0].has_application_role) {
+      throw new Error('DATABASE_URL must use a non-superuser account that is a member of stallhub_app.');
+    }
+
+    app.listen(PORT, () => {
+      console.log(`API server running at http://localhost:${PORT}`);
+      console.log(`Check API and database status at http://localhost:${PORT}/api/health`);
+    });
+  } catch (error) {
+    console.error(`API startup blocked: ${error.message}`);
+    await require('./config/db').end();
+    process.exitCode = 1;
+  }
+}
+
+startServer();

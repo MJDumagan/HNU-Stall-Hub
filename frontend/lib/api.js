@@ -1,4 +1,17 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const SIGNED_OUT_SESSION_KEY = 'stallhub_signed_out';
+
+export function markSessionSignedOut() {
+  window.sessionStorage.setItem(SIGNED_OUT_SESSION_KEY, 'true');
+}
+
+export function clearSessionSignedOut() {
+  window.sessionStorage.removeItem(SIGNED_OUT_SESSION_KEY);
+}
+
+export function isSessionSignedOut() {
+  return window.sessionStorage.getItem(SIGNED_OUT_SESSION_KEY) === 'true';
+}
 
 export async function apiRequest(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {

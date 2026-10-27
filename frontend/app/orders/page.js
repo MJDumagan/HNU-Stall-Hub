@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import LoadingScreen from '../components/loading-screen';
 import { apiRequest } from '../../lib/api';
+import { getStallNumber } from '../../lib/stall-number';
 import { useRequireRole } from '../../lib/use-require-role';
 
 export default function CustomerOrdersPage() {
@@ -32,8 +33,11 @@ export default function CustomerOrdersPage() {
         {error && <div className="error-message" role="alert">{error}</div>}
         {orders.length === 0 ? <div className="empty-state"><h3>No orders yet</h3><p>Place an order at a campus stall to see it here.</p><Link href="/" className="primary-button">Browse stalls</Link></div> : (
           <div className="orders-list">{orders.map((order) => <article className="order-card" key={order.order_id}>
-            <div className="order-heading"><div><p className="eyebrow">{order.store_name}</p><h2>Order #{order.order_id}</h2><p>{new Date(order.created_at).toLocaleString()}</p></div><span className="status-pill">{order.order_status}</span></div>
+            <div className="order-heading"><div><p className="eyebrow">Stall No. {getStallNumber(order.store_id)}</p><h2>Order #{order.order_id}</h2><p>{new Date(order.created_at).toLocaleString()}</p></div><span className="status-pill">{order.order_status}</span></div>
             <div className="order-items">{order.items.map((item) => <p key={item.product_id}>{item.quantity} × {item.product_name} <span>₱{(Number(item.unit_price) * item.quantity).toFixed(2)}</span></p>)}</div>
+            <p className="order-payment-status">{order.payment_method
+              ? `Paid at stall · ${order.payment_method.replace('_', ' ')} · ${new Date(order.paid_at).toLocaleString()}`
+              : order.order_status === 'Completed' ? 'Payment not recorded in app' : 'Pay at the stall when you pick up your order'}</p>
             <div className="cart-total"><span>Total</span><strong>₱{Number(order.total_amount).toFixed(2)}</strong></div>
           </article>)}</div>
         )}

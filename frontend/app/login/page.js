@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { apiRequest } from '../../lib/api';
+import { apiRequest, clearSessionSignedOut, markSessionSignedOut } from '../../lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,6 +18,16 @@ export default function LoginPage() {
   const [registering, setRegistering] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    markSessionSignedOut();
+  }, []);
+
+  function toggleRegistration() {
+    if (!registering && role === 'admin') setRole('customer');
+    setRegistering(!registering);
+    setError('');
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -44,7 +54,8 @@ export default function LoginPage() {
             method: 'POST',
             body: JSON.stringify({ school_id: schoolId, password, role }),
           });
-      router.replace(result.data.redirect);
+      clearSessionSignedOut();
+      router.push(result.data.redirect);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -62,8 +73,15 @@ export default function LoginPage() {
         <p className="login-intro">Sign in to order from campus stalls or manage your stall.</p>
 
         <p className="role-picker-label">{registering ? 'Create an account as' : 'Log in as'}</p>
-        <div className="role-picker" role="radiogroup" aria-label={registering ? 'Choose account type to create' : 'Choose your account type'}>
-            {[['customer', 'Customer'], ['seller', 'Seller']].map(([value, label]) => (
+        <div
+          className={`role-picker ${registering ? 'role-picker-registering' : 'role-picker-login'}`}
+          role="radiogroup"
+          aria-label={registering ? 'Choose account type to create' : 'Choose your account type'}
+        >
+            {(registering
+              ? [['customer', 'Customer'], ['seller', 'Seller']]
+              : [['customer', 'Customer'], ['seller', 'Seller'], ['admin', 'Administrator']]
+            ).map(([value, label]) => (
               <button
                 key={value}
                 type="button"
@@ -130,12 +148,14 @@ export default function LoginPage() {
 
         <p className="account-switch">
           {registering ? 'Already have an account?' : 'New to StallHub?'}{' '}
-          <button type="button" onClick={() => { setRegistering(!registering); setError(''); }}>
+          <button type="button" onClick={toggleRegistration}>
             {registering ? 'Log in' : 'Create an account'}
           </button>
         </p>
         {!registering && <p className="seller-account-note">
-          To create a seller account, choose Seller above, then select Create an account.
+          {role === 'admin'
+            ? 'Administrator accounts are provisioned by HNU and cannot be created through public registration.'
+            : 'To create a seller account, choose Seller above, then select Create an account.'}
         </p>}
       </section>
     </main>

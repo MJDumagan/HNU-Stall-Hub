@@ -7,7 +7,6 @@
       "category_id": 1,
       "product_name": "Woven Market Basket",
       "price": 249,
-      "sku": "SH-BASKET-01",
       "is_active": true,
       "category_name": "Home"
     },
@@ -17,7 +16,6 @@
       "category_id": 1,
       "product_name": "Fresh Mango Jam",
       "price": 89.5,
-      "sku": "SH-JAM-05",
       "is_active": true,
       "category_name": "Food"
     },
@@ -27,7 +25,6 @@
       "category_id": 1,
       "product_name": "Hand-poured Soy Candle",
       "price": 175,
-      "sku": "SH-CANDLE-12",
       "is_active": true,
       "category_name": "Home"
     },
@@ -37,7 +34,6 @@
       "category_id": 1,
       "product_name": "Canvas Tote Bag",
       "price": 199,
-      "sku": "SH-TOTE-03",
       "is_active": true,
       "category_name": "Fashion"
     },
@@ -47,7 +43,6 @@
       "category_id": 1,
       "product_name": "Dried Mango Pack",
       "price": 65,
-      "sku": "SH-MANGO-02",
       "is_active": true,
       "category_name": "Food"
     },
@@ -57,7 +52,6 @@
       "category_id": 1,
       "product_name": "Bamboo Spoon Set",
       "price": 120,
-      "sku": "SH-SPOON-01",
       "is_active": true,
       "category_name": "Home"
     },
@@ -67,7 +61,6 @@
       "category_id": 1,
       "product_name": "Test Basket",
       "price": 150,
-      "sku": "SKU-001",
       "is_active": true,
       "category_name": "Marketplace item"
     },
@@ -77,7 +70,6 @@
       "category_id": 1,
       "product_name": "Blue Umbrella",
       "price": 95,
-      "sku": "SH-UMB-09",
       "is_active": true,
       "category_name": "Marketplace item"
     }

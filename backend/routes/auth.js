@@ -13,6 +13,12 @@ const SCHOOL_ID_PREFIX = {
   customer: '0',
   seller: '2',
 };
+const LOGIN_ROLES = ['customer', 'seller', 'admin'];
+
+function isValidSchoolId(role, schoolId) {
+  if (role === 'admin') return /^\d{8}$/.test(schoolId);
+  return Boolean(SCHOOL_ID_PREFIX[role] && new RegExp(`^${SCHOOL_ID_PREFIX[role]}\\d{7}$`).test(schoolId));
+}
 
 router.post('/login', async (req, res) => {
   const schoolId = typeof req.body.school_id === 'string' ? req.body.school_id.trim() : '';
@@ -20,11 +26,11 @@ router.post('/login', async (req, res) => {
   const requestedRole = typeof req.body.role === 'string' ? req.body.role.toLowerCase() : '';
 
   if (!schoolId || schoolId.length > 100 || !password || password.length > 128 ||
-      !['customer', 'seller'].includes(requestedRole)) {
+      !LOGIN_ROLES.includes(requestedRole)) {
     return res.status(400).json({ success: false, message: 'Enter your account ID, password, and select a role.' });
   }
 
-  if (!new RegExp(`^${SCHOOL_ID_PREFIX[requestedRole]}\\d{7}$`).test(schoolId)) {
+  if (!isValidSchoolId(requestedRole, schoolId)) {
     return res.status(400).json({
       success: false,
       message: 'This School ID does not match the selected account type.',
@@ -48,7 +54,8 @@ router.post('/login', async (req, res) => {
       success: true,
       data: {
         user: { user_id: user.user_id, school_id: user.school_id, full_name: user.full_name, role: user.role },
-        redirect: user.role === 'seller' ? '/seller/dashboard' : '/',
+        redirect: user.role === 'seller' ? '/seller/dashboard' :
+          user.role === 'admin' ? '/admin/dashboard' : '/',
       },
     });
   } catch (error) {

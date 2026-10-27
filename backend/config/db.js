@@ -24,6 +24,13 @@ if (
   throw new Error('DATABASE_URL must contain the real Supabase PostgreSQL host, username, and password.');
 }
 
+if (
+  process.env.NODE_ENV === 'production' &&
+  ['localhost', 'localhost.', '127.0.0.1', '::1', '[::1]'].includes(databaseUrl.hostname.toLowerCase())
+) {
+  throw new Error('Production DATABASE_URL must point to a cloud PostgreSQL host, not localhost.');
+}
+
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
   throw new Error('SESSION_SECRET must be configured with at least 32 characters.');
 }
