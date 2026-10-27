@@ -1,0 +1,77 @@
+{
+  "nextId": 9,
+  "products": [
+    {
+      "product_id": 6,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Woven Market Basket",
+      "price": 249,
+      "is_active": true,
+      "category_name": "Home"
+    },
+    {
+      "product_id": 5,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Fresh Mango Jam",
+      "price": 89.5,
+      "is_active": true,
+      "category_name": "Food"
+    },
+    {
+      "product_id": 4,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Hand-poured Soy Candle",
+      "price": 175,
+      "is_active": true,
+      "category_name": "Home"
+    },
+    {
+      "product_id": 3,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Canvas Tote Bag",
+      "price": 199,
+      "is_active": true,
+      "category_name": "Fashion"
+    },
+    {
+      "product_id": 2,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Dried Mango Pack",
+      "price": 65,
+      "is_active": true,
+      "category_name": "Food"
+    },
+    {
+      "product_id": 1,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Bamboo Spoon Set",
+      "price": 120,
+      "is_active": true,
+      "category_name": "Home"
+    },
+    {
+      "product_id": 7,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Test Basket",
+      "price": 150,
+      "is_active": true,
+      "category_name": "Marketplace item"
+    },
+    {
+      "product_id": 8,
+      "store_id": 1,
+      "category_id": 1,
+      "product_name": "Blue Umbrella",
+      "price": 95,
+      "is_active": true,
+      "category_name": "Marketplace item"
+    }
+  ]
+}
