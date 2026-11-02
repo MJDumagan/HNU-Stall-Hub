@@ -6,10 +6,6 @@ The existing project is a Next.js frontend and an Express/PostgreSQL API (using 
 
 The browser does not connect directly to Supabase and does not contain database credentials. The Express API verifies the account, sets an HTTP-only session cookie, and performs database access. `backend/schema.sql` is the complete PostgreSQL schema for a new, empty database. The Node.js backend is a separate service and is not pasted into the Supabase SQL editor.
 
-## Why PostgreSQL
-
-StallHub uses PostgreSQL because its data is relational: users own stalls, stalls have products and inventory, and customers place orders for those products. PostgreSQL helps keep these relationships consistent and supports transactions, which are important for operations such as placing an order and updating stock together. It also provides database features used by this project, including constraints, indexes, enums, views, functions, and triggers. Supabase hosts the PostgreSQL database in the cloud, while the Express API connects to it using the `pg` package. The frontend does not connect to the database directly.
-
 ## Supabase setup
 
 1. Choose the database setup path:
