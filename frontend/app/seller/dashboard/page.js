@@ -11,7 +11,7 @@ import { getStallNumber } from '../../../lib/stall-number';
 import { useRequireRole } from '../../../lib/use-require-role';
 
 const EMPTY_PRODUCT = { product_name: '', category_id: '', description: '', image_url: '', tags: [], price: '', quantity_in_stock: '0', reorder_level: '5' };
-const ORDERS_PER_PAGE = 5;
+const ORDERS_PER_PAGE = 6;
 
 export default function SellerDashboardPage() {
   const router = useRouter();
@@ -362,7 +362,7 @@ export default function SellerDashboardPage() {
                 </article>;
               })}
               </div>
-              {orderPageCount > 1 && <nav className="order-pagination" aria-label="Order pages">
+              <nav className="order-pagination" aria-label="Order pages">
                 <button type="button" className="small-action" onClick={() => setOrderPage(currentOrderPage - 1)} disabled={currentOrderPage === 1}>Previous</button>
                 {orderPageNumbers.map((page, index) => (
                   <span className="order-page-group" key={page}>
@@ -377,7 +377,7 @@ export default function SellerDashboardPage() {
                   </span>
                 ))}
                 <button type="button" className="small-action" onClick={() => setOrderPage(currentOrderPage + 1)} disabled={currentOrderPage === orderPageCount}>Next</button>
-              </nav>}
+              </nav>
             </>}
           </section>
         </>}
