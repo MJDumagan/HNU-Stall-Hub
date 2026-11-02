@@ -107,4 +107,54 @@ router.delete('/stalls/:storeId', async (req, res) => {
   }
 });
 
+router.post('/stalls/:storeId/restore', async (req, res) => {
+  const storeId = Number(req.params.storeId);
+  if (!Number.isSafeInteger(storeId) || storeId < 1) {
+    return res.status(400).json({ success: false, message: 'Invalid stall ID.' });
+  }
+
+  const client = await pool.connect();
+  let transactionStarted = false;
+  try {
+    await client.query('BEGIN');
+    transactionStarted = true;
+
+    const stall = await client.query(
+      'SELECT store_id, is_active FROM stores WHERE store_id = $1 FOR UPDATE',
+      [storeId]
+    );
+    if (!stall.rowCount) {
+      await client.query('ROLLBACK');
+      transactionStarted = false;
+      return res.status(404).json({ success: false, message: 'Stall not found.' });
+    }
+
+    if (stall.rows[0].is_active) {
+      await client.query('ROLLBACK');
+      transactionStarted = false;
+      return res.status(409).json({ success: false, message: 'This stall is already active.' });
+    }
+
+    await client.query('UPDATE stores SET is_active = TRUE WHERE store_id = $1', [storeId]);
+    await client.query(
+      'UPDATE products SET is_active = TRUE WHERE store_id = $1 AND is_removed = FALSE',
+      [storeId]
+    );
+    await client.query('COMMIT');
+    transactionStarted = false;
+
+    res.json({
+      success: true,
+      message: 'Stall restored to the customer menu. Products that were not removed are active.',
+      data: { store_id: storeId, is_active: true },
+    });
+  } catch (error) {
+    if (transactionStarted) await client.query('ROLLBACK');
+    console.error('Stall restoration failed:', error.message);
+    res.status(500).json({ success: false, message: 'Could not restore this stall.' });
+  } finally {
+    client.release();
+  }
+});
+
 module.exports = router;

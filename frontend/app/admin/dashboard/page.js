@@ -55,6 +55,24 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function restoreStall(stall) {
+    const confirmed = window.confirm(
+      `Restore ${stall.store_name} to the customer menu? All products that were not removed will be activated.`
+    );
+    if (!confirmed) return;
+
+    setBusyStoreId(stall.store_id);
+    setError('');
+    try {
+      await apiRequest(`/admin/stalls/${stall.store_id}/restore`, { method: 'POST' });
+      await loadDashboard();
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setBusyStoreId(null);
+    }
+  }
+
   async function handleLogout() {
     markSessionSignedOut();
     try {
@@ -237,6 +255,16 @@ export default function AdminDashboardPage() {
                             onClick={() => removeStall(stall)}
                           >
                             {busyStoreId === stall.store_id ? 'Removing...' : 'Remove stall'}
+                          </button>
+                        )}
+                        {!stall.is_active && (
+                          <button
+                            type="button"
+                            className={styles.restoreButton}
+                            disabled={busyStoreId === stall.store_id}
+                            onClick={() => restoreStall(stall)}
+                          >
+                            {busyStoreId === stall.store_id ? 'Restoring...' : 'Restore stall'}
                           </button>
                         )}
                       </td>

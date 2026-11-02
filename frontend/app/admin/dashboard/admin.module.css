@@ -537,6 +537,30 @@
   opacity: 0.6;
 }
 
+.restoreButton {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #cfe4d3;
+  border-radius: 8px;
+  background: #f2f8f2;
+  color: var(--admin-green);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.restoreButton:hover:not(:disabled) {
+  border-color: #a9cdb0;
+  background: #e6f2e8;
+}
+
+.restoreButton:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .emptyState {
   padding: 34px !important;
   color: var(--admin-muted) !important;
@@ -650,7 +674,8 @@
 @media (prefers-reduced-motion: reduce) {
   .metricCard,
   .logoutButton,
-  .removeButton {
+  .removeButton,
+  .restoreButton {
     transition: none;
   }
 }
