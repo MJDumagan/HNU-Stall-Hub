@@ -168,6 +168,34 @@ router.patch('/cover', async (req, res) => {
   }
 });
 
+router.patch('/stall', async (req, res) => {
+  const storeName = typeof req.body.store_name === 'string' ? req.body.store_name.trim() : '';
+  const storeLocation = typeof req.body.store_location === 'string' ? req.body.store_location.trim() : '';
+  const description = typeof req.body.description === 'string' ? req.body.description.trim() : '';
+  if (!storeName || storeName.length > 160 || !storeLocation || storeLocation.length > 200 ||
+      description.length > 1000) {
+    return res.status(400).json({
+      success: false,
+      message: 'Enter a stall name and location within their character limits, and a description no longer than 1000 characters.',
+    });
+  }
+
+  try {
+    const store = await getSellerStore(req.user.user_id);
+    if (!store) return res.status(404).json({ success: false, message: 'Stall not found.' });
+    const result = await pool.query(
+      `UPDATE stores SET store_name = $1, store_location = $2, description = $3
+       WHERE store_id = $4
+       RETURNING store_name, store_location, description`,
+      [storeName, storeLocation, description || null, store.store_id]
+    );
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Stall details update failed:', error.message);
+    res.status(500).json({ success: false, message: 'Could not update stall details.' });
+  }
+});
+
 router.post('/products', async (req, res) => {
   const name = typeof req.body.product_name === 'string' ? req.body.product_name.trim() : '';
   const price = Number(req.body.price);
@@ -391,6 +419,7 @@ router.post('/orders/:orderId/payment', async (req, res) => {
 router.patch('/orders/:orderId/status', async (req, res) => {
   const allowedTransitions = {
     Pending: ['Confirmed'],
+    Confirmed: ['Preparing'],
     Preparing: ['Ready for Pickup'],
     'Ready for Pickup': [],
     Completed: [],

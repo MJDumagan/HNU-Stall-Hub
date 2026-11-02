@@ -2,7 +2,7 @@ const NON_VIAND_TERMS =
   /\b(drinks?|beverages?|water|juice|soda|coffee|tea|milk|shake|smoothie|frappe|snacks?|chips?|fries|candy|chocolate|cookies?|biscuits?|popcorn|crackers?|nuts?|cake|ice cream|dessert|candy|candies)\b/i;
 
 function isRiceAddonEligible(productName, categoryName) {
-  if (['drinks', 'snacks'].includes(String(categoryName || '').trim().toLowerCase())) {
+  if (['drink', 'drinks', 'snack', 'snacks'].includes(String(categoryName || '').trim().toLowerCase())) {
     return false;
   }
   return !NON_VIAND_TERMS.test(productName || '');
