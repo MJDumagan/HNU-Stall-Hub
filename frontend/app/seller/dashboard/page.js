@@ -27,6 +27,10 @@ export default function SellerDashboardPage() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [profileNotice, setProfileNotice] = useState('');
+  const [stallName, setStallName] = useState('');
+  const [stallLocation, setStallLocation] = useState('');
+  const [stallDescription, setStallDescription] = useState('');
+  const [savingStallDetails, setSavingStallDetails] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef(null);
   const orderPageCount = dashboard ? Math.ceil(dashboard.orders.length / ORDERS_PER_PAGE) : 0;
@@ -201,6 +205,29 @@ export default function SellerDashboardPage() {
     }
   }
 
+  async function saveStallDetails(event) {
+    event.preventDefault();
+    setProfileError('');
+    setProfileNotice('');
+    setSavingStallDetails(true);
+    try {
+      await apiRequest('/vendor/stall', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          store_name: stallName,
+          store_location: stallLocation,
+          description: stallDescription,
+        }),
+      });
+      await refresh();
+      setProfileNotice('Your stall details have been updated.');
+    } catch (requestError) {
+      setProfileError(requestError.message);
+    } finally {
+      setSavingStallDetails(false);
+    }
+  }
+
   if (!ready) return <LoadingScreen title="Welcome back" message="Securing your seller dashboard..." />;
 
   return (
@@ -212,7 +239,14 @@ export default function SellerDashboardPage() {
         </Link>
         <nav className="nav-links"><a href="#menu">My menu</a><a href="#orders">Orders</a></nav>
         <div className="account-actions">
-          <button className="profile-trigger" type="button" onClick={() => { setProfileOpen(true); setProfileError(''); setProfileNotice(''); }}>
+          <button className="profile-trigger" type="button" onClick={() => {
+            setProfileOpen(true);
+            setProfileError('');
+            setProfileNotice('');
+            setStallName(dashboard?.stall.store_name || '');
+            setStallLocation(dashboard?.stall.store_location || '');
+            setStallDescription(dashboard?.stall.description || '');
+          }}>
             <span className="profile-avatar" aria-hidden="true">{user?.full_name?.charAt(0)?.toUpperCase() || 'S'}</span>
             <span>{user?.full_name}</span><span aria-hidden="true">⌄</span>
           </button>
@@ -358,6 +392,46 @@ export default function SellerDashboardPage() {
             <p className="profile-intro">Manage your account and how customers see your stall.</p>
             {profileError && <p className="form-error" role="alert">{profileError}</p>}
             {profileNotice && <p className="success-message" role="status">{profileNotice}</p>}
+
+            <section className="profile-section">
+              <div>
+                <h3>Stall details</h3>
+                <p>Update the name, location, and description customers see on your stall page and menu.</p>
+              </div>
+              <form className="profile-stall-form" onSubmit={saveStallDetails}>
+                <label htmlFor="seller-stall-name">Stall name</label>
+                <input
+                  id="seller-stall-name"
+                  type="text"
+                  value={stallName}
+                  onChange={(event) => setStallName(event.target.value)}
+                  maxLength={160}
+                  required
+                />
+                <label htmlFor="seller-stall-location">Location</label>
+                <input
+                  id="seller-stall-location"
+                  type="text"
+                  value={stallLocation}
+                  onChange={(event) => setStallLocation(event.target.value)}
+                  maxLength={200}
+                  required
+                />
+                <label htmlFor="seller-stall-description">Description</label>
+                <textarea
+                  id="seller-stall-description"
+                  value={stallDescription}
+                  onChange={(event) => setStallDescription(event.target.value)}
+                  maxLength={1000}
+                  rows={4}
+                />
+                <div className="profile-actions">
+                  <button className="submit-button" type="submit" disabled={savingStallDetails}>
+                    {savingStallDetails ? 'Saving details...' : 'Save stall details'}
+                  </button>
+                </div>
+              </form>
+            </section>
 
             <section className="profile-section">
               <div>

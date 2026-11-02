@@ -144,10 +144,10 @@ export default function StallMenuPage() {
                     <strong>₱{((Number(product.price) + riceAddon.price) * cart[product.product_id]).toFixed(2)}</strong>
                   </div>;
                 })}
-                {checkoutStarted && cartItems.length > 0 && (
+                {checkoutStarted && cartItems.some((product) => product.rice_addon_eligible) && (
                   <div className="rice-addon-list">
                     <p className="eyebrow">OPTIONAL RICE ADD-ONS</p>
-                    <p className="muted-copy">Choose rice for each viand serving, or leave it as no rice.</p>
+                    <p className="muted-copy">Rice is optional. “No thanks” is selected by default, or choose a rice add-on.</p>
                     {cartItems.filter((product) => product.rice_addon_eligible).map((product) => (
                       <label className="rice-addon-option" key={product.product_id}>
                         <span>{cart[product.product_id]} × {product.product_name}</span>
@@ -158,15 +158,12 @@ export default function StallMenuPage() {
                             [product.product_id]: event.target.value,
                           }))}
                         >
-                          <option value="none">No rice</option>
+                          <option value="none">No thanks</option>
                           <option value="half">½ cup rice · ₱8 each</option>
                           <option value="full">1 cup rice · ₱15 each</option>
                         </select>
                       </label>
                     ))}
-                    {!cartItems.some((product) => product.rice_addon_eligible) && (
-                      <p className="muted-copy">Rice add-ons are not available for drinks or snacks.</p>
-                    )}
                   </div>
                 )}
                 <div className="cart-total"><span>Total</span><strong>₱{total.toFixed(2)}</strong></div>
