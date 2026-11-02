@@ -7,7 +7,7 @@ router.use(authenticate, requireRole('admin'));
 
 router.get('/dashboard', async (req, res) => {
   try {
-    const [summary, stalls] = await Promise.all([
+    const [summary, stalls, recentOrders, recentInventoryChanges] = await Promise.all([
       pool.query(`
         SELECT
           (SELECT COUNT(*)::integer FROM stores) AS total_stalls,
@@ -30,11 +30,35 @@ router.get('/dashboard', async (req, res) => {
         GROUP BY s.store_id, u.full_name
         ORDER BY s.is_active DESC, s.store_name
       `),
+      pool.query(`
+        SELECT o.order_id, o.total_amount, o.order_status, o.created_at,
+               s.store_name, u.full_name AS customer_name
+        FROM orders o
+        JOIN stores s ON s.store_id = o.store_id
+        JOIN users u ON u.user_id = o.customer_id
+        ORDER BY o.created_at DESC, o.order_id DESC
+        LIMIT 10
+      `),
+      pool.query(`
+        SELECT log.log_id, log.quantity_changed, log.action_reason, log.logged_at,
+               product.product_name, store.store_name
+        FROM inventory_logs log
+        JOIN inventory item ON item.inventory_id = log.inventory_id
+        JOIN products product ON product.product_id = item.product_id
+        JOIN stores store ON store.store_id = product.store_id
+        ORDER BY log.logged_at DESC, log.log_id DESC
+        LIMIT 10
+      `),
     ]);
 
     res.json({
       success: true,
-      data: { summary: summary.rows[0], stalls: stalls.rows },
+      data: {
+        summary: summary.rows[0],
+        stalls: stalls.rows,
+        recentOrders: recentOrders.rows,
+        recentInventoryChanges: recentInventoryChanges.rows,
+      },
     });
   } catch (error) {
     console.error('Administrator dashboard failed:', error.message);

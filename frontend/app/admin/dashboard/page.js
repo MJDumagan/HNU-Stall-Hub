@@ -7,6 +7,15 @@ import { apiRequest, logout, markSessionSignedOut } from '../../../lib/api';
 import { useRequireRole } from '../../../lib/use-require-role';
 import styles from './admin.module.css';
 
+function formatActivityDate(value) {
+  return new Date(value).toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, ready } = useRequireRole('admin');
@@ -116,6 +125,75 @@ export default function AdminDashboardPage() {
               <strong>{dashboard.summary.active_customers}</strong>
               <span className={styles.metricHint}>Registered campus users</span>
             </article>
+          </section>
+
+          <section className={styles.activitySection} aria-label="Recent campus activity">
+            <div className={styles.activityHeading}>
+              <div>
+                <p className={styles.sectionEyebrow}>CAMPUS MONITORING</p>
+                <h2>Recent activity</h2>
+                <p>Latest orders and recorded inventory changes.</p>
+              </div>
+              <span className={styles.activityNote}>Latest 10 events in each list</span>
+            </div>
+            <div className={styles.activityGrid}>
+              <section className={styles.activityCard} aria-labelledby="recent-orders-title">
+                <div className={styles.activityCardHeading}>
+                  <span className={styles.activityIcon} aria-hidden="true">↗</span>
+                  <div>
+                    <h3 id="recent-orders-title">Recent orders</h3>
+                    <p>Most recently placed campus orders</p>
+                  </div>
+                </div>
+                {dashboard.recentOrders.length ? (
+                  <ul className={styles.activityList}>
+                    {dashboard.recentOrders.map((order) => (
+                      <li className={styles.activityItem} key={order.order_id}>
+                        <div className={styles.activityItemMain}>
+                          <strong>Order #{order.order_id}</strong>
+                          <span>{order.customer_name} · {order.store_name}</span>
+                          <small>{formatActivityDate(order.created_at)}</small>
+                        </div>
+                        <div className={styles.activityItemMeta}>
+                          <strong>₱{Number(order.total_amount).toFixed(2)}</strong>
+                          <span className={styles.orderStatus}>{order.order_status}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={styles.activityEmpty}>No orders have been placed yet.</p>
+                )}
+              </section>
+
+              <section className={styles.activityCard} aria-labelledby="inventory-activity-title">
+                <div className={styles.activityCardHeading}>
+                  <span className={`${styles.activityIcon} ${styles.inventoryIcon}`} aria-hidden="true">▤</span>
+                  <div>
+                    <h3 id="inventory-activity-title">Inventory log</h3>
+                    <p>Recorded stock adjustments and sales</p>
+                  </div>
+                </div>
+                {dashboard.recentInventoryChanges.length ? (
+                  <ul className={styles.activityList}>
+                    {dashboard.recentInventoryChanges.map((change) => (
+                      <li className={styles.activityItem} key={change.log_id}>
+                        <div className={styles.activityItemMain}>
+                          <strong>{change.product_name}</strong>
+                          <span>{change.store_name} · {change.action_reason}</span>
+                          <small>{formatActivityDate(change.logged_at)}</small>
+                        </div>
+                        <strong className={`${styles.stockChange} ${Number(change.quantity_changed) < 0 ? styles.stockOut : styles.stockIn}`}>
+                          {Number(change.quantity_changed) > 0 ? '+' : ''}{change.quantity_changed}
+                        </strong>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={styles.activityEmpty}>No inventory changes have been recorded yet.</p>
+                )}
+              </section>
+            </div>
           </section>
 
           <section className={styles.management}>
